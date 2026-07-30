@@ -1,4 +1,4 @@
-import { upsertEvent } from "../actions";
+import { upsertEvent } from "./actions";
 
 interface EventFormProps {
   event?: {
