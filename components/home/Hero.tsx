@@ -1,23 +1,59 @@
 "use client";
 
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
+/** Floating bubbles drifting upward at randomized sizes/speeds/positions. */
+function BubbleField() {
+  const bubbles = useMemo(
+    () =>
+      Array.from({ length: 20 }, () => ({
+        left: Math.random() * 100,
+        size: Math.random() * 50 + 14,
+        duration: Math.random() * 14 + 12,
+        delay: Math.random() * 10,
+      })),
+    []
+  );
+
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {bubbles.map((b, i) => (
+        <span
+          key={i}
+          className="bubble"
+          style={{
+            left: `${b.left}%`,
+            bottom: "-10%",
+            width: b.size,
+            height: b.size,
+            animationDuration: `${b.duration}s`,
+            animationDelay: `${b.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * SignalOrb — a 3D "gyroscope": three rings spinning on different axes
+ * (transform-style: preserve-3d), each carrying a glowing satellite dot
+ * that visibly orbits around it, plus a pulsing core. Tilts toward the
+ * cursor for an interactive parallax feel.
+ */
 function SignalOrb() {
   const tiltRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce || !tiltRef.current) return;
-
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
-
-    const rotateY = (x / (rect.width / 2)) * 18; // left/right tilt
-    const rotateX = -(y / (rect.height / 2)) * 18; // up/down tilt
-
+    const rotateY = (x / (rect.width / 2)) * 18;
+    const rotateX = -(y / (rect.height / 2)) * 18;
     tiltRef.current.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
   };
 
@@ -37,22 +73,15 @@ function SignalOrb() {
         className="relative h-full w-full transition-transform duration-300 ease-out"
         style={{ transformStyle: "preserve-3d" }}
       >
-        {/* Ring A */}
-        <div
-          className="orb-ring animate-spin-ring-a"
-          style={{ border: "2px solid rgba(63,208,255,0.55)" }}
-        />
-        {/* Ring B */}
-        <div
-          className="orb-ring animate-spin-ring-b"
-          style={{ border: "2px solid rgba(108,99,255,0.5)" }}
-        />
-        {/* Ring C */}
-        <div
-          className="orb-ring animate-spin-ring-c"
-          style={{ border: "1.5px dashed rgba(63,208,255,0.35)" }}
-        />
-        {/* Pulsing core */}
+        <div className="orb-ring animate-spin-ring-a" style={{ border: "2px solid rgba(63,208,255,0.55)" }}>
+          <span className="absolute left-1/2 top-0 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-signalCyan shadow-[0_0_12px_4px_rgba(63,208,255,0.8)]" />
+        </div>
+        <div className="orb-ring animate-spin-ring-b" style={{ border: "2px solid rgba(108,99,255,0.5)" }}>
+          <span className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-signalViolet shadow-[0_0_12px_4px_rgba(108,99,255,0.8)]" />
+        </div>
+        <div className="orb-ring animate-spin-ring-c" style={{ border: "1.5px dashed rgba(63,208,255,0.35)" }}>
+          <span className="absolute left-1/2 top-0 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_10px_3px_rgba(255,255,255,0.7)]" />
+        </div>
         <div
           className="animate-pulse-core absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
@@ -68,6 +97,7 @@ function SignalOrb() {
 export default function Hero() {
   return (
     <section className="relative flex min-h-[92vh] items-center overflow-hidden bg-signal-gradient pt-[72px]">
+      <BubbleField />
       <div className="container-shell relative z-10 grid grid-cols-1 items-center gap-12 py-24 md:grid-cols-2">
         <div className="text-center md:text-left">
           <motion.p

@@ -146,3 +146,39 @@ body {
   filter: blur(80px);
   pointer-events: none;
 }
+
+/* Floating bubbles — hero background */
+@keyframes float-bubble {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0.55;
+  }
+
+  50% {
+    transform: translateY(-45vh) translateX(15px) scale(1.15);
+    opacity: 0.35;
+  }
+
+  100% {
+    transform: translateY(-95vh) translateX(-15px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.bubble {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), rgba(63, 208, 255, 0.15) 60%, transparent 80%);
+  animation: float-bubble linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble {
+    animation: none;
+    opacity: 0.1;
+  }
+}
